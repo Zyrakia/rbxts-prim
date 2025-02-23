@@ -1,0 +1,43 @@
+{
+	"name": "@rbxts/prim",
+	"description": "Primitives to drive feature-focused Roblox development.",
+	"version": "0.1.0",
+	"main": "out/init.lua",
+	"types": "out/index.d.ts",
+	"license": "MIT",
+	"scripts": {
+		"build": "rbxtsc",
+		"watch": "rbxtsc -w",
+		"prepublishOnly": "bun run build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/zyrakia/rbxts-prim"
+	},
+	"bugs": {
+		"url": "https://github.com/zyrakia/rbxts-prim"
+	},
+	"files": [
+		"out/**/*.lua",
+		"out/**/*.d.ts"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"keywords": [
+		"roblox",
+		"roblox-ts",
+		"rbxts",
+		"primitive",
+		"core",
+		"utils"
+	],
+	"dependencies": {
+		"roblox-ts": "^3.0.0"
+	},
+	"devDependencies": {
+		"@rbxts/compiler-types": "^3.0.0-types.0",
+		"@rbxts/types": "^1.0.837",
+		"bun": "^1.2.3"
+	}
+}

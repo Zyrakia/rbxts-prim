@@ -1,5 +1,3 @@
-import { Rand } from 'data';
-
 /**
  * Returns a random lowercase alphabetical letter (a-z).
  *

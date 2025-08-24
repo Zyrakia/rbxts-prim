@@ -82,3 +82,59 @@ export function shuffle<T>(array: Array<T>, random = new Random()) {
 
 	return shuffled;
 }
+
+/**
+ * Checks if both arrays are the same size and contain the same elements.
+ *
+ * @param first the first array to compare
+ * @param second the second array to compare
+ * @returns whether the arrays are equal
+ */
+export function equals<T extends defined>(first: ReadonlyArray<T>, second: ReadonlyArray<T>) {
+	if (first.size() !== second.size()) return false;
+
+	for (let i = 0; i < first.size(); i++) {
+		if (first[i] !== second[i]) return false;
+	}
+
+	return true;
+}
+
+/**
+ * Returns a copy of the input array sliced down to the specified indices.
+ * The input array is NOT modified.
+ *
+ * @param array the array to slice
+ * @param start the index to start at
+ * @param stop the index to stop at
+ * @returns the specified slice of the input array
+ */
+export function slice<T>(array: T[], start: number, stop?: number) {
+	const size = array.size();
+
+	const startI = math.min(start, size);
+	const endI = stop === undefined ? size : math.min(stop + 1, size);
+
+	const result = [];
+	for (let i = startI; i < endI; i++) result.push(array[i]);
+	return result;
+}
+
+/**
+ * Pushes a value at every `n` index of an array.
+ *
+ * @param arr the input array
+ * @param value the value to push
+ * @param n the number of indexes before every insert
+ * @returns a copy of the input array with values inserted
+ */
+export function putEvery<T>(arr: ReadonlyArray<T>, n: number, value: T) {
+	const newArray = [];
+
+	for (let i = 0; i < arr.size(); i++) {
+		if (i === 0 ? n === 0 : i % n === 0) newArray.push(value);
+		newArray.push(arr[i]);
+	}
+
+	return newArray;
+}

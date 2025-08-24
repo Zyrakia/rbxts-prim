@@ -1,3 +1,4 @@
-export * as Arr from './arr';
+export * as Arr from './array';
 export * as Collection from './collection';
 export * as Rand from './rand';
+export * as Num from './number';

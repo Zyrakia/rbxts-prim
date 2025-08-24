@@ -33,11 +33,14 @@
 		"utils"
 	],
 	"dependencies": {
-		"roblox-ts": "^3.0.0"
+		"@rbxts/services": "^1.5.5",
+		"@rbxts/t": "^3.2.1"
 	},
 	"devDependencies": {
 		"@rbxts/compiler-types": "^3.0.0-types.0",
 		"@rbxts/types": "^1.0.837",
-		"bun": "^1.2.3"
+		"@types/bun": "^1.2.20",
+		"bun": "^1.2.3",
+		"roblox-ts": "^3.0.0"
 	}
 }

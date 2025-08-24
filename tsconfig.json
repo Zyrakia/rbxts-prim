@@ -1,28 +1,55 @@
 {
-	"compilerOptions": {
-		// required
-		"allowSyntheticDefaultImports": true,
-		"downlevelIteration": true,
-		"jsx": "react",
-		"jsxFactory": "Roact.createElement",
-		"jsxFragmentFactory": "Roact.createFragment",
-		"module": "commonjs",
-		"moduleResolution": "Node",
-		"noLib": true,
-		"resolveJsonModule": true,
-		"forceConsistentCasingInFileNames": true,
-		"moduleDetection": "force",
-		"strict": true,
-		"target": "ESNext",
-		"typeRoots": [
-			"node_modules/@rbxts"
-		],
-		// configurable
-		"rootDir": "src",
-		"outDir": "out",
-		"baseUrl": "src",
-		"incremental": true,
-		"tsBuildInfoFile": "out/tsconfig.tsbuildinfo",
-		"declaration": true
-	}
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "jsx": "react",
+    "jsxFactory": "Roact.createElement",
+    "jsxFragmentFactory": "Roact.createFragment",
+    "module": "commonjs",
+    "moduleResolution": "Node",
+    "noLib": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleDetection": "force",
+    "strict": true,
+    "target": "ESNext",
+    "typeRoots": [
+      "node_modules/@rbxts"
+    ],
+    "rootDir": "src",
+    "outDir": "out",
+    "baseUrl": "src",
+    "incremental": true,
+    "tsBuildInfoFile": "out/tsconfig.tsbuildinfo",
+    "declaration": true,
+    "paths": {
+      "prim/char": [
+        "@char/index.ts"
+      ],
+      "prim/tree": [
+        "@tree/index.ts"
+      ],
+      "prim/arr": [
+        "data/@arr.ts"
+      ],
+      "prim/for-each": [
+        "data/@for-each.ts"
+      ],
+      "prim/num": [
+        "data/@num.ts"
+      ],
+      "prim/rand": [
+        "data/@rand/index.ts"
+      ],
+      "prim/str": [
+        "data/@str.ts"
+      ],
+      "prim/fetch": [
+        "net/fetch.ts"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ]
 }

@@ -1,5 +1,5 @@
 import { t } from '@rbxts/t';
-import { Arr } from 'data';
+import { Arr, Collection } from 'data';
 
 type Collection<T = unknown> = Set<T> | Map<unknown, T> | Array<T> | Record<string, T>;
 
@@ -64,10 +64,7 @@ export function iterate<K extends string, V>(
  * @param collection the collection to iterate over
  * @param callback the callback to invoke for each entry
  */
-export function iterate<T>(
-	collection: Collection<T>,
-	callback: (key: unknown, value: T) => void,
-): void;
+export function iterate<T>(collection: Collection<T>, callback: (key: unknown, value: T) => void): void;
 
 export function iterate(collection: Collection, callback: (key: any, value: any) => void) {
 	if (isMap(collection)) {
@@ -85,6 +82,68 @@ export function iterate(collection: Collection, callback: (key: any, value: any)
 	} else {
 		for (const value of collection) {
 			callback(true, value);
+		}
+	}
+}
+
+/**
+ * Returns a generator that yields entries within
+ * a set until depleted.
+ *
+ * @param collection the set to iterate over
+ */
+export function iterator<V>(collection: Set<V>): Generator<[key: true, value: V]>;
+
+/**
+ * Returns a generator that yields entries within
+ * a map until depleted.
+ *
+ * @param collection the map to iterate over
+ */
+export function iterator<K, V>(collection: Map<K, V>): Generator<[key: K, value: V]>;
+
+/**
+ * Returns a generator that yields entries within
+ * a array until depleted.
+ *
+ * @param collection the array to iterate over
+ */
+export function iterator<V>(collection: Array<V>): Generator<[key: number, value: V]>;
+
+/**
+ * Returns a generator that yields entries within
+ * a record until depleted.
+ *
+ * @param collection the record to iterate over
+ */
+export function iterator<K extends string, V>(
+	collection: Record<K, V> | Map<K, V>,
+): Generator<[key: K, value: V]>;
+
+/**
+ * Returns a generator that yields entries within
+ * a collection until depleted.
+ *
+ * @param collection the collection to iterate over
+ */
+export function iterator<V>(collection: Collection<V>): Generator<[key: unknown, value: V]>;
+
+export function* iterator(collection: Collection) {
+	if (isMap(collection)) {
+		for (const entry of collection) {
+			yield entry;
+		}
+	} else if (isRecord(collection)) {
+		for (const entry of pairs(collection)) {
+			yield entry;
+		}
+	} else if (Arr.is(collection)) {
+		for (const [i, value] of ipairs(collection)) {
+			yield [i, value];
+		}
+	} else {
+		for (const value of collection) {
+			yield [true, value];
 		}
 	}
 }
@@ -125,10 +184,7 @@ export function map<V, R>(collection: Array<V>, callback: (key: number, value: V
  * @param mapper the function to return the result for each value
  * @return the array of values gathered
  */
-export function map<T, R>(
-	collection: Collection<T>,
-	callback: (key: unknown, value: T) => R,
-): Array<R>;
+export function map<T, R>(collection: Collection<T>, callback: (key: unknown, value: T) => R): Array<R>;
 
 /**
  * Gathers results by mapping every entry within a record.
@@ -170,10 +226,7 @@ export function run<T extends Callback>(collection: Collection<T>, ...args: Para
  * @param args the arguments to pass to each entry invocation
  * @return a promise that resolves when all invocations finish
  */
-export async function runAsync<T extends Callback>(
-	collection: Collection<T>,
-	...args: Parameters<T>
-) {
+export async function runAsync<T extends Callback>(collection: Collection<T>, ...args: Parameters<T>) {
 	const run = async (v: T) => void (await v(...(args as unknown[])));
 	await Promise.all(map(collection, (_, v) => run(v)));
 }
@@ -187,6 +240,16 @@ export async function runAsync<T extends Callback>(
 export function toValueArray<T extends defined>(collection: Collection<T>) {
 	return map(collection, (_, v) => v);
 }
+
+/**
+ * Extracts all entries from a record and gathers them into an array.
+ *
+ * @param collection the record to convert
+ * @returns an array containing all entries
+ */
+export function toEntryArray<K extends string, V>(
+	collection: Record<K, V> | Map<K, V>,
+): Array<[key: K, value: V]>;
 
 /**
  * Extracts all entries from a set and gathers them into an array.
@@ -212,19 +275,17 @@ export function toEntryArray<K, V>(collection: Map<K, V>): Array<[key: K, value:
  */
 export function toEntryArray<V>(collection: Array<V>): Array<[key: number, value: V]>;
 
-/**
- * Extracts all entries from a record and gathers them into an array.
- *
- * @param collection the record to convert
- * @returns an array containing all entries
- */
-export function toEntryArray<K extends string, V>(
-	collection: Record<K, V> | Map<K, V>,
-): Array<[key: K, value: V]>;
-
 export function toEntryArray(collection: Collection) {
 	return map(collection, (k, v) => [k, v]);
 }
+
+/**
+ * Extracts all keys from an array and gathers them into an array.
+ *
+ * @param collection the array to convert
+ * @return an array containing all keys
+ */
+export function toKeyArray(collection: Array<unknown>): Array<number>;
 
 /**
  * Extracts all keys from a set and gathers them into an array.
@@ -243,22 +304,12 @@ export function toKeyArray(collection: Set<unknown>): Array<true>;
 export function toKeyArray<K>(collection: Map<K, unknown>): Array<K>;
 
 /**
- * Extracts all keys from an array and gathers them into an array.
- *
- * @param collection the array to convert
- * @return an array containing all keys
- */
-export function toKeyArray(collection: Array<unknown>): Array<number>;
-
-/**
  * Extracts all keys from a record and gathers them into an array.
  *
  * @param collection the record to convert
  * @return an array containing all keys
  */
-export function toKeyArray<K extends string>(
-	collection: Record<K, unknown> | Map<K, unknown>,
-): Array<K>;
+export function toKeyArray<K extends string>(collection: Record<K, unknown> | Map<K, unknown>): Array<K>;
 
 export function toKeyArray(collection: Collection) {
 	return map(collection, (k, _) => k);

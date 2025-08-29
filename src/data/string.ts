@@ -1,3 +1,5 @@
+import { Arr } from 'data';
+
 /**
  * Removes whitespace from the beginning and end of a string.
  * Graciously stolen from https://github.com/roblox-ts/string-utils
@@ -103,6 +105,38 @@ export function extractNumbers(str: string) {
  */
 export function truncate(str: string, length: number, suffix = '...') {
 	return str.size() > length ? str.sub(0, length) + suffix : str;
+}
+
+type PluralizeRule = { rep: string; with: string };
+
+/**
+ * Pluralized a word depending on the associated count.
+ *
+ * If the ending is not a constant, and none of the rules match,
+ * the fallback ending will be the constant `'s'`.
+ *
+ * @param word the word to pluralize
+ * @param count the count associated to the word
+ * @param ending the pluralized ending, either a constant or replacement rule(s), default `'s'`
+ * @return the pluralized word, or the original word if `count` is `1`
+ */
+export function pluralize(
+	word: string,
+	count: number,
+	ending: string | PluralizeRule | PluralizeRule[] = 's',
+) {
+	if (math.abs(count) === 1) return word;
+	if (typeIs(ending, 'string')) return word + ending;
+
+	for (const rule of Arr.ensure(ending)) {
+		const { rep: search, with: replacement } = rule;
+
+		if (endsWith(word, search)) {
+			return slice(word, 1, word.size() - search.size()) + replacement;
+		}
+	}
+
+	return word + 's';
 }
 
 /**

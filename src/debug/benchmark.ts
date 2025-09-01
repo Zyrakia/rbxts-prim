@@ -1,4 +1,5 @@
 import { RunService } from '@rbxts/services';
+
 import * as Time from '../time';
 
 /**

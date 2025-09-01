@@ -1,8 +1,7 @@
 import { Collection } from 'data';
-import { Time } from 'index';
 import { typedLiteralFactory } from 'type-helpers';
 
-type TimeUnit = { seconds: number; name: string; symbol: string };
+export type TimeUnit = { seconds: number; name: string; symbol: string };
 
 export const Unit = typedLiteralFactory<Record<string, TimeUnit>>()({
 	FEMTO: { seconds: 1e-15, name: 'femtosecond', symbol: 'fs' },

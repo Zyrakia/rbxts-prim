@@ -1,5 +1,6 @@
-import { t } from '@rbxts/t';
 import { Arr, Collection } from 'data';
+
+import { t } from '@rbxts/t';
 
 type Collection<T = unknown> = Set<T> | Map<unknown, T> | Array<T> | Record<string, T>;
 

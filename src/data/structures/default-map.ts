@@ -1,4 +1,3 @@
-import { Players } from '@rbxts/services';
 
 /**
  * Represents a map that generates a

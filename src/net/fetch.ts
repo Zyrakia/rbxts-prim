@@ -1,7 +1,8 @@
-import { HttpService } from '@rbxts/services';
-import { t } from '@rbxts/t';
 import { Collection, Str } from 'data';
 import { JSON } from 'net';
+
+import { HttpService } from '@rbxts/services';
+import { t } from '@rbxts/t';
 
 type Method = RequestAsyncRequest['Method'];
 

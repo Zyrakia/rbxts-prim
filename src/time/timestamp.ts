@@ -49,10 +49,10 @@ export function cpu() {
  * Both timestamps are assumed to be in the same unit.
  *
  * @param start the starting timestamp
- * @param end the ending timestamp (default {@link now})
+ * @param fin the ending timestamp (default {@link now})
  * @return the difference between the two timestamps, in the same unit as both timestamps
  */
-export function diff(start: number, end = now()) {
-	const diff = end - start;
+export function diff(start: number, fin = now()) {
+	const diff = fin - start;
 	return diff;
 }

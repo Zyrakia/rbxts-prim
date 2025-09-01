@@ -19,8 +19,7 @@
 		"baseUrl": "src",
 		"incremental": true,
 		"tsBuildInfoFile": "out/tsconfig.tsbuildinfo",
-		"declaration": true,
-		"ignoreDeprecations": "6.0"
+		"declaration": true
 	},
 	"include": ["src"]
 }

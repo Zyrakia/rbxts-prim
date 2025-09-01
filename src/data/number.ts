@@ -1,4 +1,4 @@
-import { Arr } from 'data';
+import * as Arr from './array';
 
 /**
  * Returns whether the given number is an integer.

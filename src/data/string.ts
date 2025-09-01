@@ -1,4 +1,4 @@
-import { Arr } from 'data';
+import * as Arr from './array';
 
 /**
  * Removes whitespace from the beginning and end of a string.

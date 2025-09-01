@@ -4,3 +4,6 @@ export * as Rand from './rand';
 export * as Num from './number';
 export * as Str from './string';
 export * as Obj from './object';
+export * as Color from './color';
+
+export * from './structures';

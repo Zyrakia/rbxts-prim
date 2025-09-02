@@ -6,4 +6,4 @@ export * from './data';
 export * from './type-helpers';
 export * from './net';
 export * from './debug';
-export * from './instances';
+export * from './instance';

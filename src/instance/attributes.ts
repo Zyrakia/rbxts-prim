@@ -91,7 +91,7 @@ export function clear(instance: Instance, key?: string) {
  * @param schema the attributes keys to select and the type guard their value must pass
  * @return a record containing all selected attributes that passed their schema
  */
-export function select<T extends Record<string, t.check<AttributeValue | undefined>>>(
+export function pick<T extends Record<string, t.check<AttributeValue | undefined>>>(
 	instance: Instance,
 	schema: T,
 ) {

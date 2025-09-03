@@ -7,3 +7,4 @@ export * from './type-helpers';
 export * from './net';
 export * from './debug';
 export * from './instance';
+export * from './scheduler';

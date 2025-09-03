@@ -4,8 +4,6 @@ import { typedLiteralFactory } from 'type-helpers';
 export type TimeUnit = { seconds: number; name: string; symbol: string };
 
 export const Unit = typedLiteralFactory<Record<string, TimeUnit>>()({
-	FEMTO: { seconds: 1e-15, name: 'femtosecond', symbol: 'fs' },
-	PICO: { seconds: 1e-12, name: 'picosecond', symbol: 'ps' },
 	NANO: { seconds: 1e-9, name: 'nanosecond', symbol: 'ns' },
 	MICRO: { seconds: 1e-6, name: 'microsecond', symbol: 'µs' },
 	MILLI: { seconds: 1e-3, name: 'millisecond', symbol: 'ms' },
@@ -19,12 +17,15 @@ export const Unit = typedLiteralFactory<Record<string, TimeUnit>>()({
 } as const);
 
 /**
- * All time units sorted in ascending order based on the
- * amount of seconds they are equal to.
+ * Sorts an array of time units.
+ *
+ * @param units the units to sort (occurs in plce)
+ * @param dir the direction of the sort, default `'asc'`
+ * @return the sorted units for convenience, but the sort happens in-place
  */
-const AscendingUnits = Collection.toEntryArray(Unit).sort(
-	([, { seconds: a }], [, { seconds: b }]) => a < b,
-);
+function sortUnits(units: TimeUnit[], dir: 'asc' | 'desc' = 'asc') {
+	return units.sort(({ seconds: a }, { seconds: b }) => (dir === 'asc' ? a < b : a > b));
+}
 
 /**
  * Converts a time value from one unit to another.
@@ -37,36 +38,47 @@ const AscendingUnits = Collection.toEntryArray(Unit).sort(
 export function convert(value: number, from: TimeUnit, to: TimeUnit) {
 	return (value * from.seconds) / to.seconds;
 }
-
-type StringifyMethod = (seconds: number, ...args: any[]) => string;
-
-const StringifyStyles = typedLiteralFactory<Record<string, StringifyMethod>>()({
-	/**
-	 * Stringifies seconds into a string consisting of hours, minutes and seconds.
-	 *
-	 * @param format the format of the result, with variables `'h'` (hour), `'m'` (minute) or `'s'` (second), default `'hh:mm:ss'`
-	 * @param twentyFourHour whether the inserted values will be in 24-hour format, default `false`
-	 */
-	clock: (seconds, format: string = 'hh:mm:ss', twentyFourHour = false) => {
-		return '';
-	},
-
-	sentence: (seconds) => {
-		return '';
-	},
-});
-
-type StringifyStyles = typeof StringifyStyles;
-
 /**
- * Stringifies seconds in a specific style.
+ * Deconstructs (or "disects") a total number of seconds into specified time units.
+ *
+ * The provided `units` are internally sorted in descending order based on their
+ * duration. The function then iteratively "consumes" as many of the input
+ * seconds as possible for each unit, passing any remainder to the next
+ * smaller unit.
+ *
+ * If any seconds remain after processing all specified units, they are
+ * automatically added to the result under the `SECOND` unit. This occurs
+ * regardless of whether `SECOND` was initially included in the `units` parameter.
+ *
+ * @param seconds the total number of seconds to deconstruct
+ * @param units the time units to use for deconstruction
+ * @returns an array with each entry containing a `unit` and the `amount` of seconds it consumed, in
+ * descending order based on the size of the unit
  */
-export function stringify<T extends keyof StringifyStyles>(
-	seconds: number,
-	style: T,
-	...args: Parameters<StringifyStyles[T]> extends [seconds: number, ...other: infer K]
-		? K
-		: never[]
-) {}
+export function disect(seconds: number, ...units: TimeUnit[]) {
+	const targetUnits = sortUnits(units, 'desc');
+	const res: { unit: TimeUnit; amount: number }[] = [];
 
-stringify(5, 'clock');
+	let remainingSeconds = seconds;
+	for (const unit of targetUnits) {
+		const unitSeconds = unit.seconds;
+
+		if (remainingSeconds < unitSeconds) {
+			res.push({ unit, amount: 0 });
+			continue;
+		}
+
+		const unitAmount = math.floor(remainingSeconds / unitSeconds);
+		remainingSeconds -= unitAmount * unitSeconds;
+
+		res.push({ unit, amount: unitAmount });
+	}
+
+	if (remainingSeconds) {
+		const existing = res.find((v) => v.unit === Unit.SECOND);
+		if (existing) existing.amount += remainingSeconds;
+		else res.push({ unit: Unit.SECOND, amount: remainingSeconds });
+	}
+
+	return res;
+}

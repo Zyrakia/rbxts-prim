@@ -61,8 +61,8 @@ export interface Timeout {
 	isDestroyed(): boolean;
 }
 
-const sToMs = (ms: number) => Time.convert(ms, Time.Unit.MILLI, Time.Unit.SECOND);
-const msToS = (s: number) => Time.convert(s, Time.Unit.SECOND, Time.Unit.MILLI);
+const msToS = (ms: number) => Time.convert(ms, Time.Unit.MILLI, Time.Unit.SECOND);
+const sToMs = (s: number) => Time.convert(s, Time.Unit.SECOND, Time.Unit.MILLI);
 
 /**
  * Schedules a callback to be executed every `timeoutMs` milliseconds.
@@ -77,11 +77,11 @@ export function setInterval<T extends any[]>(
 	timeoutMs: number,
 	...args: T
 ) {
-	let timeout = sToMs(timeoutMs);
+	let timeout = msToS(timeoutMs);
 	let destroyed = false;
 
 	let latest: { timeout: number; start: number } | undefined;
-	task.spawn(() => {
+	const thread = task.spawn(() => {
 		while (!destroyed) {
 			latest = { timeout, start: Time.now() };
 			task.wait(timeout);
@@ -100,12 +100,15 @@ export function setInterval<T extends any[]>(
 			const elapsed = Time.diff(start, Time.now());
 			const remaining = math.max(0, timeout - elapsed);
 
-			return msToS(remaining);
+			return sToMs(remaining);
 		},
 
-		getTimeout: () => msToS(timeout),
-		setTimeout: (ms) => void (timeout = sToMs(ms)),
-		destroy: () => void (destroyed = true),
+		getTimeout: () => sToMs(timeout),
+		setTimeout: (ms) => void (timeout = msToS(ms)),
+		destroy: () => {
+			destroyed = true;
+			task.cancel(thread);
+		},
 		isDestroyed: () => destroyed,
 	} satisfies Interval;
 }
@@ -140,13 +143,13 @@ export function setTimeout<T extends any[]>(
 	timeoutMs: number,
 	...args: T
 ) {
-	const timeout = msToS(timeoutMs);
+	const timeout = sToMs(timeoutMs);
 
 	let start: number | undefined;
 	let destroyed = false;
 	let executed = false;
 
-	task.spawn(() => {
+	const thread = task.spawn(() => {
 		start = Time.now();
 		task.wait(timeout);
 		start = undefined;
@@ -164,12 +167,15 @@ export function setTimeout<T extends any[]>(
 			const elapsed = Time.diff(start, Time.now());
 			const remaining = math.max(0, timeout - elapsed);
 
-			return msToS(remaining);
+			return sToMs(remaining);
 		},
 
-		getTimeout: () => sToMs(timeout),
+		getTimeout: () => msToS(timeout),
 		hasExecuted: () => executed,
-		destroy: () => void (destroyed = true),
+		destroy: () => {
+			destroyed = true;
+			task.cancel(thread);
+		},
 		isDestroyed: () => destroyed,
 	} satisfies Timeout;
 }
@@ -182,7 +188,7 @@ export function setTimeout<T extends any[]>(
  */
 export function sleep(ms: number) {
 	return new Promise<void>((resolve) => {
-		task.wait(msToS(ms));
+		task.wait(sToMs(ms));
 		resolve();
 	});
 }

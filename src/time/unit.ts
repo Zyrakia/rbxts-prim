@@ -46,9 +46,9 @@ export function convert(value: number, from: TimeUnit, to: TimeUnit) {
  * seconds as possible for each unit, passing any remainder to the next
  * smaller unit.
  *
- * If any seconds remain after processing all specified units, they are
- * automatically added to the result under the `SECOND` unit. This occurs
- * regardless of whether `SECOND` was initially included in the `units` parameter.
+ * If `SECOND` is not within the provided units, it will be added to the end
+ * of the result, with a value of any remaining seconds that were unconsumed
+ * by another unit.
  *
  * @param seconds the total number of seconds to deconstruct
  * @param units the time units to use for deconstruction
@@ -63,22 +63,15 @@ export function disect(seconds: number, ...units: TimeUnit[]) {
 	for (const unit of targetUnits) {
 		const unitSeconds = unit.seconds;
 
-		if (remainingSeconds < unitSeconds) {
-			res.push({ unit, amount: 0 });
-			continue;
-		}
-
 		const unitAmount = math.floor(remainingSeconds / unitSeconds);
 		remainingSeconds -= unitAmount * unitSeconds;
 
 		res.push({ unit, amount: unitAmount });
 	}
 
-	if (remainingSeconds) {
-		const existing = res.find((v) => v.unit === Unit.SECOND);
-		if (existing) existing.amount += remainingSeconds;
-		else res.push({ unit: Unit.SECOND, amount: remainingSeconds });
-	}
+	const existing = res.find((v) => v.unit === Unit.SECOND);
+	if (existing) existing.amount += remainingSeconds;
+	else res.push({ unit: Unit.SECOND, amount: remainingSeconds });
 
 	return res;
 }

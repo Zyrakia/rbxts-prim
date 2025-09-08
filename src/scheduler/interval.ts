@@ -5,31 +5,31 @@ export interface Interval {
 	 * Returns the amount of milliseconds remaining before the
 	 * next interval execution.
 	 */
-	getRemaining(): number;
+	getRemaining: () => number;
 
 	/**
 	 * Returns the number of milliseconds this interval
 	 * waits for between each execution.
 	 */
-	getTimeout(): number;
+	getTimeout: () => number;
 
 	/**
 	 * Adjusts the timeout, in milliseconds, for the **next** execution.
 	 * If an adjustment takes place mid-wait, the **current** wait will still
 	 * complete with the original timeout.
 	 */
-	setTimeout(ms: number): void;
+	setTimeout: (ms: number) => void;
 
 	/**
 	 * Destroys this interval. There will be no further
 	 * executions after this is called.
 	 */
-	destroy(): void;
+	destroy: () => void;
 
 	/**
 	 * Returns whether this interval has been destroyed.
 	 */
-	isDestroyed(): boolean;
+	isDestroyed: () => boolean;
 }
 
 export interface Timeout {
@@ -37,28 +37,28 @@ export interface Timeout {
 	 * Returns the amount of milliseconds remaining before the
 	 * scheduled execution.
 	 */
-	getRemaining(): number;
+	getRemaining: () => number;
 
 	/**
 	 * Returns the number of milliseconds this timeout was started with.
 	 */
-	getTimeout(): number;
+	getTimeout: () => number;
 
 	/**
 	 * Returns whether this timeout has elapsed and the callback has executed.
 	 */
-	hasExecuted(): boolean;
+	hasExecuted: () => boolean;
 
 	/**
 	 * Destroys this timeout. If the timeout has not elapsed yet, no
 	 * execution will happen, otherwise this does nothing.
 	 */
-	destroy(): void;
+	destroy: () => void;
 
 	/**
 	 * Returns whether this timeout has been destroyed.
 	 */
-	isDestroyed(): boolean;
+	isDestroyed: () => boolean;
 }
 
 const msToS = (ms: number) => Time.convert(ms, Time.Unit.MILLI, Time.Unit.SECOND);
@@ -72,11 +72,7 @@ const sToMs = (s: number) => Time.convert(s, Time.Unit.SECOND, Time.Unit.MILLI);
  * @param args the arguments to pass to the callback
  * @return an interval handle to control the interval
  */
-export function setInterval<T extends any[]>(
-	cb: (...args: T) => void,
-	timeoutMs: number,
-	...args: T
-) {
+export function setInterval<T extends unknown[]>(cb: (...args: T) => void, timeoutMs: number, ...args: T) {
 	let timeout = msToS(timeoutMs);
 	let destroyed = false;
 
@@ -121,11 +117,7 @@ export function setInterval<T extends any[]>(
  * @param args the arguments to pass to the callback
  * @return an interval handle to control the interval
  */
-export function setIntervalNow<T extends any[]>(
-	cb: (...args: T) => void,
-	timeoutMs: number,
-	...args: T
-) {
+export function setIntervalNow<T extends unknown[]>(cb: (...args: T) => void, timeoutMs: number, ...args: T) {
 	task.spawn(() => void cb(...args));
 	return setInterval(cb, timeoutMs, ...args);
 }
@@ -138,11 +130,7 @@ export function setIntervalNow<T extends any[]>(
  * @param args the arguments to pass to the callback on execution
  * @return a timeout handle to control the timeout
  */
-export function setTimeout<T extends any[]>(
-	cb: (...args: T) => void,
-	timeoutMs: number,
-	...args: T
-) {
+export function setTimeout<T extends unknown[]>(cb: (...args: T) => void, timeoutMs: number, ...args: T) {
 	const timeout = sToMs(timeoutMs);
 
 	let start: number | undefined;

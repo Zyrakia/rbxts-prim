@@ -27,7 +27,7 @@ export class Throttle {
 	 * @param timeoutMs the minimum delay between executions
 	 * @return the throttle wrapper function
 	 */
-	public static wrap<A extends any[], R>(fn: (...args: A) => R, timeoutMs: number) {
+	public static wrap<A extends unknown[], R>(fn: (...args: A) => R, timeoutMs: number) {
 		const throttle = new Throttle(timeoutMs);
 		return (...args: A) => {
 			if (throttle.tryPass()) return fn(...args);
@@ -175,7 +175,7 @@ export class Debounce {
 	 * @param cb the callback of schedule
 	 * @param args the arguments to pass
 	 */
-	public schedule<A extends any[]>(cb: (...args: A) => any, ...args: A) {
+	public schedule<A extends unknown[]>(cb: (...args: A) => any, ...args: A) {
 		this.clear();
 		this.scheduled = () => task.spawn(() => void cb(...args));
 		this.scheduler = setTimeout(() => this.flush(), this.timeoutMs);

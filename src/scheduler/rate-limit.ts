@@ -1,4 +1,5 @@
 import * as Time from '../time';
+import { setTimeout, Timeout } from './interval';
 
 export class Throttle {
 	private timeoutSeconds!: number;
@@ -130,5 +131,86 @@ export class Throttle {
 	 */
 	public setTimeout(timeoutMs: number) {
 		this.timeoutSeconds = Time.convert(timeoutMs, Time.Unit.MILLI, Time.Unit.SECOND);
+	}
+}
+
+export class Debounce {
+	private scheduled?: () => void;
+	private scheduler?: Timeout;
+
+	/**
+	 * Creates a new debounce. This debounce executes on the trailing edge
+	 * of the timeout.
+	 *
+	 * @param timeoutMs the schedule delay
+	 */
+	public constructor(private timeoutMs: number) {}
+
+	/**
+	 * Clears the currently planned schedule, if any.
+	 */
+	public clear() {
+		this.scheduler?.destroy();
+		this.scheduler = undefined;
+
+		this.scheduled = undefined;
+	}
+
+	/**
+	 * Immediately executes any scheduled callback, if any, and clears
+	 * the planned schedule.
+	 */
+	public flush() {
+		if (!this.scheduled) return;
+		this.scheduler?.destroy();
+		this.scheduled();
+		this.clear();
+	}
+
+	/**
+	 * Schedules a callback for execution with the specified arguments.
+	 *
+	 * Clears any previously scheduled callback.
+	 *
+	 * @param cb the callback of schedule
+	 * @param args the arguments to pass
+	 */
+	public schedule<A extends any[]>(cb: (...args: A) => any, ...args: A) {
+		this.clear();
+		this.scheduled = () => task.spawn(() => void cb(...args));
+		this.scheduler = setTimeout(() => this.flush(), this.timeoutMs);
+	}
+
+	/**
+	 * Returns whether this debounce has an
+	 * execution scheduled.
+	 */
+	public isScheduled() {
+		return this.scheduler?.hasExecuted() === false;
+	}
+
+	/**
+	 * Returns the remaining timeout (in milliseconds), until the
+	 * current scheduled execution will occur. If there is no scheduled
+	 * execution, returns nothing.
+	 */
+	public getRemainingTimeout() {
+		if (!this.scheduler || this.scheduler.hasExecuted()) return undefined;
+		return this.scheduler.getRemaining();
+	}
+
+	/**
+	 * Returns the current timeout (in milliseconds) .
+	 */
+	public getTimeout() {
+		return this.timeoutMs;
+	}
+
+	/**
+	 * Replaces the current timeout. This is applied
+	 * on the next schedule.
+	 */
+	public setTimeout(timeoutMs: number) {
+		this.timeoutMs = timeoutMs;
 	}
 }

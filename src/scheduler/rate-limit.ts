@@ -195,8 +195,7 @@ export class Debounce {
 	 * execution, returns nothing.
 	 */
 	public getRemainingTimeout() {
-		if (!this.scheduler || this.scheduler.hasExecuted()) return undefined;
-		return this.scheduler.getRemaining();
+		return this.scheduler?.getRemaining();
 	}
 
 	/**

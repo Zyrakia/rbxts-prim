@@ -72,18 +72,19 @@ const sToMs = (s: number) => Time.convert(s, Time.Unit.SECOND, Time.Unit.MILLI);
  * @param args the arguments to pass to the callback
  * @return an interval handle to control the interval
  */
-export function setInterval<T extends unknown[]>(cb: (...args: T) => void, timeoutMs: number, ...args: T) {
+export function setInterval<T extends unknown[]>(
+	cb: (...args: T) => void,
+	timeoutMs: number,
+	...args: T
+): Readonly<Interval> {
 	let timeout = msToS(timeoutMs);
-	let destroyed = false;
 
 	let latest: { timeout: number; start: number } | undefined;
 	const thread = task.spawn(() => {
-		while (!destroyed) {
+		while (true) {
 			latest = { timeout, start: Time.now() };
 			task.wait(timeout);
 			latest = undefined;
-
-			if (destroyed) break;
 			void cb(...args);
 		}
 	});
@@ -101,12 +102,9 @@ export function setInterval<T extends unknown[]>(cb: (...args: T) => void, timeo
 
 		getTimeout: () => sToMs(timeout),
 		setTimeout: (ms) => void (timeout = msToS(ms)),
-		destroy: () => {
-			destroyed = true;
-			task.cancel(thread);
-		},
-		isDestroyed: () => destroyed,
-	} satisfies Interval;
+		destroy: () => task.cancel(thread),
+		isDestroyed: () => coroutine.status(thread) === 'dead',
+	};
 }
 
 /**
@@ -130,19 +128,20 @@ export function setIntervalNow<T extends unknown[]>(cb: (...args: T) => void, ti
  * @param args the arguments to pass to the callback on execution
  * @return a timeout handle to control the timeout
  */
-export function setTimeout<T extends unknown[]>(cb: (...args: T) => void, timeoutMs: number, ...args: T) {
-	const timeout = sToMs(timeoutMs);
+export function setTimeout<T extends unknown[]>(
+	cb: (...args: T) => void,
+	timeoutMs: number,
+	...args: T
+): Readonly<Timeout> {
+	const timeout = msToS(timeoutMs);
 
 	let start: number | undefined;
-	let destroyed = false;
 	let executed = false;
 
 	const thread = task.spawn(() => {
 		start = Time.now();
 		task.wait(timeout);
 		start = undefined;
-
-		if (destroyed) return;
 
 		executed = true;
 		cb(...args);
@@ -160,12 +159,9 @@ export function setTimeout<T extends unknown[]>(cb: (...args: T) => void, timeou
 
 		getTimeout: () => msToS(timeout),
 		hasExecuted: () => executed,
-		destroy: () => {
-			destroyed = true;
-			task.cancel(thread);
-		},
-		isDestroyed: () => destroyed,
-	} satisfies Timeout;
+		destroy: () => task.cancel(thread),
+		isDestroyed: () => coroutine.status(thread) === 'dead',
+	};
 }
 
 /**

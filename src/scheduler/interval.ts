@@ -1,4 +1,4 @@
-import * as Time from '../time';
+import * as Time from '../@time';
 
 export interface Interval {
 	/**
@@ -115,7 +115,11 @@ export function setInterval<T extends unknown[]>(
  * @param args the arguments to pass to the callback
  * @return an interval handle to control the interval
  */
-export function setIntervalNow<T extends unknown[]>(cb: (...args: T) => void, timeoutMs: number, ...args: T) {
+export function setIntervalNow<T extends unknown[]>(
+	cb: (...args: T) => void,
+	timeoutMs: number,
+	...args: T
+) {
 	task.spawn(() => void cb(...args));
 	return setInterval(cb, timeoutMs, ...args);
 }

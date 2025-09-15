@@ -1,6 +1,6 @@
 import { RunService } from '@rbxts/services';
 
-import * as Time from '../time';
+import * as Time from '../@time';
 
 /**
  * Holds the result of a benchmark and allows for inspection.

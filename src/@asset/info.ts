@@ -46,3 +46,24 @@ export async function getInfo(assetId: number, infoType?: CastsToEnum<Enum.InfoT
 		return MarketplaceService.GetProductInfo(assetId, infoType);
 	} catch (err) {}
 }
+
+/**
+ * Returns whether the given asset ID is associated with an asset that
+ * is of one of the specified types.
+ *
+ * This will fetch the asset info from the marketplace to obtain
+ * the type of the asset.
+ *
+ * @param assetId the asset ID to check
+ * @param oneOfType the types to check the asset against
+ * @return whether the asset is valid and of one of the specified types
+ */
+export async function isType(assetId: number, ...oneOfType: Enum.AssetType[]) {
+	const info = await getInfo(assetId);
+	if (!info) return false;
+
+	const assetType = Enum.AssetType.GetEnumItems().find((v) => v.Value === info.AssetTypeId);
+	if (!assetType) return false;
+
+	return oneOfType.includes(assetType);
+}

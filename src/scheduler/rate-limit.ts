@@ -1,4 +1,4 @@
-import * as Time from '../time';
+import * as Time from '../@time';
 import { setTimeout, Timeout } from './interval';
 
 export class Throttle {

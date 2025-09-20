@@ -157,7 +157,7 @@ export function setTimeout<T extends unknown[]>(
 			return sToMs(remaining);
 		},
 
-		getTimeout: () => msToS(timeout),
+		getTimeout: () => sToMs(timeout),
 		hasExecuted: () => executed,
 		destroy: () => task.cancel(thread),
 		isDestroyed: () => coroutine.status(thread) === 'dead',
@@ -172,7 +172,7 @@ export function setTimeout<T extends unknown[]>(
  */
 export function sleep(ms: number) {
 	return new Promise<void>((resolve) => {
-		task.wait(sToMs(ms));
+		task.wait(msToS(ms));
 		resolve();
 	});
 }

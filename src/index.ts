@@ -9,4 +9,4 @@ export * from './net';
 export * from './debug';
 export * from './instance';
 export * from './scheduler';
-export * from './physics'
+export * from './physics';

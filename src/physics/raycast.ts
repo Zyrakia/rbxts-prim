@@ -267,14 +267,11 @@ function pierceCast(
 
 		appendFilter(params, res.Instance);
 
-		const studsToEnd = nextDirection.Magnitude - res.Distance;
-		if (studsToEnd <= options.epsilon) break;
-
-		// Guard rare floating point magnitude 0
 		const mag = nextDirection.Magnitude;
-		if (mag < 1e-6) break;
+		const studsToEnd = mag - res.Distance;
+		if (mag <= 1e-6 || studsToEnd <= options.epsilon) break;
 
-		const unit = nextDirection.Unit;
+		const unit = nextDirection.div(mag);
 		nextOrigin = res.Position.add(unit.mul(options.epsilon));
 		nextDirection = unit.mul(studsToEnd - options.epsilon);
 	}

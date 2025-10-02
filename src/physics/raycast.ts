@@ -60,9 +60,7 @@ export function makeParams(init: Partial<ParamsInit> = {}) {
 	const { include: includeList, exclude: excludeList } = init;
 	const includeMode = includeList !== undefined;
 
-	params.FilterType = includeMode
-		? Enum.RaycastFilterType.Include
-		: Enum.RaycastFilterType.Exclude;
+	params.FilterType = includeMode ? Enum.RaycastFilterType.Include : Enum.RaycastFilterType.Exclude;
 	params.FilterDescendantsInstances = includeMode ? includeList : excludeList ?? [];
 
 	if (init.ignoreWater !== undefined) params.IgnoreWater = init.ignoreWater;
@@ -140,6 +138,20 @@ export function rayFromScreen(pixelPosition: Vector2, depth?: number) {
 
 /**
  * Returns a unit ray originating at the current Workspace camera,
+ * and pointing towards the given viewport pixel in world space.
+ *
+ * @param pixelPosition the pixel coordinates on the viewport
+ * @param depth how far (in studs) in front of the camera the ray should originate, default `0`
+ * @return the constructed ray
+ */
+export function rayFromViewport(pixelPosition: Vector2, depth?: number) {
+	const cam = Workspace.CurrentCamera;
+	assert(cam, 'Cannot cast from viewport without workspace camera');
+	return cam.ViewportPointToRay(pixelPosition.X, pixelPosition.Y, depth);
+}
+
+/**
+ * Returns a unit ray originating at the current Workspace camera,
  * and pointing towards where the current mouse location would
  * be in world space.
  *
@@ -148,7 +160,7 @@ export function rayFromScreen(pixelPosition: Vector2, depth?: number) {
  */
 export function rayFromMouse(depth?: number) {
 	const mousePos = UserInputService.GetMouseLocation();
-	return rayFromScreen(mousePos, depth);
+	return rayFromViewport(mousePos, depth);
 }
 
 /**
@@ -219,11 +231,7 @@ interface PierceOptions {
 	onHit?: (hit: RaycastResult, hitCount: number, opts: Readonly<PierceOptions>) => void | boolean;
 }
 
-type CastStrategy = (
-	origin: Vector3,
-	direction: Vector3,
-	params: RaycastParams,
-) => RaycastResult | undefined;
+type CastStrategy = (origin: Vector3, direction: Vector3, params: RaycastParams) => RaycastResult | undefined;
 
 /**
  * Performs a piercing cast, which continues past hits up to a limit,
@@ -314,12 +322,7 @@ export function pierceUnitRay(ray: Ray, length: number, init?: Partial<PierceOpt
  * @param params optional raycast parameters
  * @returns the result of the sphere cast, if anything was hit
  */
-export function fireSphere(
-	origin: Vector3,
-	radius: number,
-	direction: Vector3,
-	params?: ParamsLike,
-) {
+export function fireSphere(origin: Vector3, radius: number, direction: Vector3, params?: ParamsLike) {
 	return Workspace.Spherecast(origin, radius, direction, resolveParamsLike(params));
 }
 
@@ -433,12 +436,7 @@ export function pierceBlock(
 	const direction = typeIs(dirOrDist, 'number') ? originCf.LookVector.mul(dirOrDist) : dirOrDist;
 
 	const cast: CastStrategy = (o, d, p) => {
-		const newOrigin = CFrame.fromMatrix(
-			o,
-			originCf.XVector,
-			originCf.YVector,
-			originCf.ZVector,
-		);
+		const newOrigin = CFrame.fromMatrix(o, originCf.XVector, originCf.YVector, originCf.ZVector);
 
 		return Workspace.Blockcast(newOrigin, size, d, p);
 	};

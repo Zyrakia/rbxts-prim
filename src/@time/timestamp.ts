@@ -2,6 +2,8 @@ import { Workspace } from '@rbxts/services';
 
 /**
  * Returns the current unix timestamp in seconds, in UTC.
+ *
+ * Equivalalent to `os.time()` - accurate to seconds (integer).
  */
 export function now() {
 	return os.time();
@@ -10,7 +12,7 @@ export function now() {
 /**
  * Returns the current unix timestamp of the server, in seconds.
  *
- * Equivalent to `Workspace.GetServerTimeNow()`.
+ * Equivalent to `Workspace.GetServerTimeNow()` - accurate past seconds (float).
  */
 export function serverNow() {
 	return Workspace.GetServerTimeNow();
@@ -20,6 +22,7 @@ export function serverNow() {
  * Returns the current unix timestamp of the client, in seconds.
  *
  * Equivalent to `tick()`.
+ * @deprecated Roblox deprecated `tick`
  */
 export function localNow() {
 	return tick();
@@ -29,7 +32,7 @@ export function localNow() {
  * Returns the amount of seconds since the game
  * has started running.
  *
- * Equivalent to `time()`.
+ * Equivalent to `time()` - accurate past seconds (float).
  */
 export function elapsed() {
 	return time();
